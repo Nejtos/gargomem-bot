@@ -1,0 +1,15 @@
+[
+  {
+    "_template_info": "Template file for world maps used in the bot. Locally, replace with actual game map data in the same structure."
+  },
+  {
+    "location_id": 1,
+    "location_name": "LocationName",
+    "gateways": {
+      "id1": "NeighborLocationOne",
+      "id2": "NeighborLocationTwo",
+      "_comment": "Add all outgoing gateways from this location_name, numbered consecutively"
+    },
+    "_comment": "Add more locations here using the same structure as above"
+  }
+]
