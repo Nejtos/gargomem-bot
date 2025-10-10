@@ -1,0 +1,90 @@
+[
+  {
+    "npc_name": "Wysoka kapłanka Gryfia",
+    "npc_id": 44114,
+    "npc_location": "Torneg",
+    "npc_location_id": 2,
+    "npc_coords": [79, 8],
+    "access_min_lvl": 0
+  },
+  {
+    "npc_name": "Szalony Etrefan",
+    "npc_id": 12646,
+    "npc_location": "Eder",
+    "npc_location_id": 33,
+    "npc_coords": [56, 40],
+    "access_min_lvl": 0
+  },
+  {
+    "npc_name": "Uzdrowicielka Makatara",
+    "npc_id": 1,
+    "npc_location": "Ithan",
+    "npc_location_id": 1,
+    "npc_coords": [18, 15],
+    "access_min_lvl": 0
+  },
+  {
+    "npc_name": "Uzdrowicielka Halfinia",
+    "npc_id": 10707,
+    "npc_location": "Karka-han",
+    "npc_location_id": 35,
+    "npc_coords": [31, 38],
+    "access_min_lvl": 0
+  },
+  {
+    "npc_name": "Doktor Nad",
+    "npc_id": 177460,
+    "npc_location": "Nithal",
+    "npc_location_id": 574,
+    "npc_coords": [5, 48],
+    "access_min_lvl": 55
+  },
+  {
+    "npc_name": "Uzdrowicielka Emanilia",
+    "npc_id": 278180,
+    "npc_location": "Liściaste Rozstaje",
+    "npc_location_id": 500,
+    "npc_coords": [21, 51],
+    "access_min_lvl": 80
+  },
+  {
+    "npc_name": "Jemenoss",
+    "npc_id": 15542,
+    "npc_location": "Mythar",
+    "npc_location_id": 257,
+    "npc_coords": [45, 13],
+    "access_min_lvl": 80
+  },
+  {
+    "npc_name": "Uzdrowicielka Hiliko",
+    "npc_id": 44127,
+    "npc_location": "Werbin",
+    "npc_location_id": 9,
+    "npc_coords": [38, 16],
+    "access_min_lvl": 0
+  },
+  {
+    "npc_name": "Uzdrowiciel Toramidamus",
+    "npc_id": 35125,
+    "npc_location": "Tuzmer",
+    "npc_location_id": 589,
+    "npc_coords": [26, 21],
+    "access_min_lvl": 80
+  },
+  {
+    "npc_name": "Mnich Seweryn",
+    "npc_id": 69282,
+    "npc_location": "Klasztor Różanitów - świątynia",
+    "npc_location_id": 2337,
+    "npc_coords": [25, 8],
+    "access_min_lvl": 140
+  },
+  {
+    "npc_name": "Kapłanka Hiada",
+    "npc_id": 77093,
+    "npc_location": "Thuzal",
+    "npc_location_id": 114,
+    "npc_coords": [52, 17],
+    "access_min_lvl": 70
+  }
+]
