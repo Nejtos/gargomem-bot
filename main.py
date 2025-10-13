@@ -1,6 +1,7 @@
 import random
 import sys
 import asyncio
+from bot.utils.credentials import read_credentials
 from bot.utils.threads import captcha_thread_func, heal_hero_thread_func
 from bot.core.driver import MyDriver
 from bot.game.auth.register import register
@@ -14,12 +15,12 @@ load_dotenv()
 
 
 async def main():
-    await start_discord_bot("Szukam herosów 😶‍🌫️")
+    await start_discord_bot("Stealth level: *undetectable* 😶‍🌫️")
     if len(sys.argv) < 2:
         print("Usage: python main.py <profile_number>")
         return
 
-    prof_num = sys.argv[1]
+    prof_num = int(sys.argv[1])
     my_driver = MyDriver()
     await my_driver.init_driver(prof_num)
 
@@ -29,12 +30,11 @@ async def main():
     asyncio.create_task(heal_hero_thread_func(heal_event))
     asyncio.create_task(captcha_thread_func(captcha_event))
 
-    page = await MyDriver().get_driver()
-    checker = await page.query_selector(".c-btn.enter-game")
-    if checker:
-        await login()
+    creds = read_credentials()
+    if prof_num in creds:
+        await login(prof_num, creds)
     else:
-        await register()
+        await register(prof_num)
     await asyncio.sleep(random.uniform(2.5, 5.5))
     await bot_interface()
     await bot(heal_event, captcha_event)

@@ -2,6 +2,7 @@ import asyncio
 import random
 from bot.core.driver import MyDriver
 from bot.integrations.dsc_loot_notifier import dsc_loot_msg, heroes_dsc_loot_msg
+from bot.utils.helpers import is_hero_dead
 
 
 async def _is_mob_alive(driver, mobId):
@@ -31,11 +32,14 @@ async def attack_mob(mobId, mob_name, heroes=False, heal_event=None):
         if await _auto_fight_if_active(driver):
             await asyncio.sleep(random.uniform(0.1, 0.2))
             continue
-        script = f"""_g("fight&a=attack&ff=1&id=-{mobId}")"""
-        # script = f"""() => window.Engine.hero.heroAtackRequest({mobId}, 1)"""
+        # script = f"""_g("fight&a=attack&ff=1&id=-{mobId}")"""
+        script = f"""() => window.Engine.hero.heroAtackRequest({mobId}, 1)"""
         await driver.evaluate(script, isolated_context=False)
 
         await asyncio.sleep(random.uniform(0.72, 1.09))
+
+    if await is_hero_dead():
+        return
 
     if heal_event:
         heal_event.set()

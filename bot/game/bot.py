@@ -20,6 +20,7 @@ from bot.game.services.e2_service import e2_service
 from bot.game.services.exp_service import exp_service
 from bot.game.services.heroes.heroes_service import heroes_service
 import bot.globals as globals
+from bot.utils.helpers import get_respawn_time, is_hero_dead
 
 
 async def bot(heal_event, captcha_event):
@@ -52,6 +53,12 @@ async def bot(heal_event, captcha_event):
 
 async def handle_game_flow(heal_event, captcha_event):
     captcha_active = await check_captcha_and_loading(captcha_event)
+
+    death_checker = await is_hero_dead()
+    if death_checker:
+        respawn_time = await get_respawn_time()
+        print(f"💀 Character is unconscious — waiting {respawn_time} seconds to respawn...")
+        await asyncio.sleep(respawn_time + 2)
 
     selected_exp = await get_selected_exp()
     selected_e2 = await get_selected_elita2()

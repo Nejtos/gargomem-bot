@@ -23,7 +23,7 @@ async def go_to_target(path, mobId=None, mobType=None):
     await driver.evaluate(script, isolated_context=False)
 
     if (len(path) <= 6 and mobId is not None) or (
-        mobType == "e2" or mobType == "heroes" or mobType == "healer"
+        mobType == "e2" or mobType == "heroes" or mobType == "healer" or mobType == "merchant"
     ):
         mob_alive_script = f"""
             () => {{
@@ -52,11 +52,6 @@ async def go_to_target(path, mobId=None, mobType=None):
 
 
 async def back_to_start(map_2d=None, goal=None):
-    """
-    Po zabiciu E2 bot wykonuje losowy ruch (również po skosie)
-    o 1–3 kratki z pola, gdzie była E2.
-    Używa a_star, żeby ruch był legalny (tylko po dostępnych polach).
-    """
     if goal is None:
         pos = await current_position()
         goal = (pos[0], pos[1])

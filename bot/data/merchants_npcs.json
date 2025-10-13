@@ -1,10 +1,72 @@
-[
-  {
-    "npc_name": "",
-    "npc_id": 0,
-    "npc_location": "",
-    "npc_location_id": 0,
-    "npc_coords": [0, 0],
-    "access_min_lvl": 0
-  }
-]
+{
+  "general": [
+    {
+      "npc_name": "Umbar",
+      "npc_id": 9502,
+      "npc_location": "Torneg",
+      "npc_location_id": 2,
+      "npc_coords": [42, 56],
+      "access_min_lvl": 15
+    }
+  ],
+  "w": [
+    {
+      "npc_name": "Kowal Alrik",
+      "npc_id": 9545,
+      "npc_location": "Torneg",
+      "npc_location_id": 2,
+      "npc_coords": [59, 18],
+      "access_min_lvl": 15
+    }
+  ],
+  "p": [
+    {
+      "npc_name": "Kowal Alrik",
+      "npc_id": 9545,
+      "npc_location": "Torneg",
+      "npc_location_id": 2,
+      "npc_coords": [59, 18],
+      "access_min_lvl": 15
+    }
+  ],
+  "b": [
+    {
+      "npc_name": "Kowal Alrik",
+      "npc_id": 9545,
+      "npc_location": "Torneg",
+      "npc_location_id": 2,
+      "npc_coords": [59, 18],
+      "access_min_lvl": 15
+    }
+  ],
+  "m": [
+    {
+      "npc_name": "Wieszczka Sara",
+      "npc_id": 44116,
+      "npc_location": "Torneg",
+      "npc_location_id": 2,
+      "npc_coords": [72, 56],
+      "access_min_lvl": 15
+    }
+  ],
+  "t": [
+    {
+      "npc_name": "Szagarat Czarny Łowca",
+      "npc_id": 44116,
+      "npc_location": "Torneg",
+      "npc_location_id": 2,
+      "npc_coords": [15, 35],
+      "access_min_lvl": 15
+    }
+  ],
+  "h": [
+    {
+      "npc_name": "Szagarat Czarny Łowca",
+      "npc_id": 44116,
+      "npc_location": "Torneg",
+      "npc_location_id": 2,
+      "npc_coords": [15, 35],
+      "access_min_lvl": 15
+    }
+  ]
+}

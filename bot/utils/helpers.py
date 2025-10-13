@@ -1,4 +1,5 @@
 import math
+import re
 from bot.core.driver import MyDriver
 from bot.game.moving.helpers import get_npcs_from_NI
 from bot.game.moving.pathfiding import a_star
@@ -128,6 +129,27 @@ async def is_hero_dead():
     """
     is_dead = await driver.evaluate("() => window.Engine.dead", isolated_context=False)
     return is_dead
+
+
+async def get_respawn_time():
+    driver = await MyDriver().get_driver()
+    dazed_time = await driver.evaluate("""
+        () => {
+            const el = document.querySelector('.dazed-time');
+            return el ? el.textContent.trim() : null;
+        }
+    """, isolated_context=False)
+
+    if not dazed_time:
+        return 0
+
+    match = re.match(r"(?:(\d+)min)?\s*(\d+)s", dazed_time)
+    if match:
+        minutes = int(match.group(1)) if match.group(1) else 0
+        seconds = int(match.group(2))
+        return minutes * 60 + seconds
+
+    return 0
 
 
 def exp_selector(exp_maps, hero_lvl):

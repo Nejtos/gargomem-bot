@@ -3,9 +3,25 @@ import asyncio
 from bot.core.driver import MyDriver
 
 
-async def login():
+async def login(profile_num=None, creds=None):
     page = await MyDriver().get_driver()
+    if profile_num is not None and creds is not None:
+        if profile_num not in creds:
+            raise KeyError(f"No login details for profile {profile_num}")
+        username, password = creds[profile_num]
     try:
+        login_input = await page.query_selector("#login-input")
+        password_input = await page.query_selector("#login-password")
+        if login_input and password_input:
+            await asyncio.sleep(random.uniform(0.4, 0.6))
+            await login_input.fill(username)
+            await asyncio.sleep(random.uniform(0.7, 1.0))
+            await password_input.fill(password)
+            await asyncio.sleep(random.uniform(0.4, 0.75))
+            login_button = await page.query_selector("#js-login-btn")
+            if login_button:
+                await login_button.click()
+                await asyncio.sleep(random.uniform(2.0, 4.0))
         close_game_info_element = await page.query_selector(".close-game-info")
         if close_game_info_element:
             await page.wait_for_selector(".close-game-info", timeout=2000)

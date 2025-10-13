@@ -3,6 +3,7 @@ import random
 from bot.game.interactions.attack import attack_mob
 from bot.game.interactions.buy import buy_potions
 from bot.game.interactions.heal import get_potions, potions_amount
+from bot.game.interactions.sell import sell_items
 from bot.game.moving.moving import go_to_target
 from bot.game.navigation.maps_dict import flatten_maps, maps_dict
 from bot.game.navigation.helpers import (
@@ -24,6 +25,7 @@ from bot.utils.helpers import (
     get_npc_id,
     get_npc_position,
 )
+from bot.utils.items import get_items_amount
 from bot.utils.world_graph import load_world_graph, bfs_path
 
 GRAPH = load_world_graph("bot/data/world_maps.json")
@@ -36,8 +38,14 @@ async def exp_service(heal_event, selected_exp):
     potions = await get_potions()
     amount = await potions_amount(potions)
 
-    if amount < 0:
+    items_amount = await get_items_amount()
+    if items_amount == 0:
+        await sell_items(hero_lvl, curr_map, GRAPH)
+
+    if amount == 0:
         await buy_potions(hero_lvl, curr_map, GRAPH)
+        await asyncio.sleep(random.uniform(0.15, 0.25))
+        heal_event.set()
 
     exp_name, exp_map_name = exp_selector(exp_dict, hero_lvl)
     if not exp_map_name:
