@@ -71,7 +71,7 @@ async def ensure_discord_client() -> discord.Client:
     return _client
 
 
-async def start_discord_bot(presence_text: str = "Nasłuchuję…"):
+async def start_discord_bot(presence_text: str = "Listening…"):
     client = await ensure_discord_client()
     try:
         await client.change_presence(

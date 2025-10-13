@@ -1,3 +1,5 @@
+import asyncio
+import math
 import time, random
 from bot.core.driver import MyDriver
 from bot.game.moving.pathfiding import a_star
@@ -43,6 +45,68 @@ async def buy_item(item_arr, amount_items):
     time.sleep(random.uniform(0.61, 0.88))
 
     script = "() => window.Engine.shop.close()"
+    await driver.evaluate(script, isolated_context=False)
+
+
+async def get_items_amount():
+    driver = await MyDriver().get_driver()
+    script = """
+        () => {
+            return window.Engine.heroEquipment.getFreeSlots();
+        }
+    """
+    items_amount = await driver.evaluate(script, isolated_context=False)
+    return items_amount
+
+
+async def get_bags_with_items():
+    driver = await MyDriver().get_driver()
+    script = """
+        () => {
+            const validBags = window.Engine.bags
+                .filter(b => b && Array.isArray(b) && b[2] !== 1195874772);
+
+            const result = validBags
+                .map(([max_size, actual_items_amount, location], index) => ({
+                    index,
+                    max_size,
+                    actual_items_amount,
+                    location
+                }))
+                .filter(b => b.actual_items_amount > 1);
+
+            return result;
+        }
+    """
+    bag_data = await driver.evaluate(script, isolated_context=False)
+    return bag_data
+
+
+async def quick_sell_items():
+    driver = await MyDriver().get_driver()
+    bag_data = await get_bags_with_items()
+
+    if not bag_data:
+        return
+
+    for bag in bag_data:
+        index = bag["index"]
+        items = bag["actual_items_amount"]
+
+        batches = min(math.ceil(items / 20), 2)
+
+        for _ in range(batches):
+            script = f"() => window.Engine.shop.greatMerchant({index})"
+            await driver.evaluate(script, isolated_context=False)
+            await asyncio.sleep(random.uniform(0.55, 0.75))
+            script = f"""
+                () => window.Engine.shop.basket.finalize()
+            """
+            await driver.evaluate(script, isolated_context=False)
+            time.sleep(random.uniform(0.61, 0.88))
+    script = f"""
+        () => window.Engine.shop.close()
+    """
     await driver.evaluate(script, isolated_context=False)
 
 

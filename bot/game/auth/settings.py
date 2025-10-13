@@ -4,15 +4,13 @@ from bot.core.driver import MyDriver
 
 
 async def settings():
-    page = await MyDriver().get_driver()
+    driver = await MyDriver().get_driver()
 
-    await page.evaluate("() => window.Engine.settings.open()")
+    await driver.evaluate("() => window.Engine.settings.open()", isolated_context=False)
     await asyncio.sleep(random.uniform(0.5, 0.75))
-    await page.locator('li[data-serveroption="27"] .checkbox').click()
+    await driver.locator('li[data-serveroption="27"] .c-checkbox__label').click()
     await asyncio.sleep(random.uniform(0.5, 0.75))
-    await page.click(
-        'xpath=//div[contains(@class, "button green small") and .//div[contains(@class, "label") and text()="Zapisz"]]'
-    )
+    await driver.evaluate("() => window.Engine.settings.close()", isolated_context=False)
     await asyncio.sleep(random.uniform(0.7, 0.9))
 
 

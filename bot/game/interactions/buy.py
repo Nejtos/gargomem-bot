@@ -44,9 +44,7 @@ def select_potion(hero_lvl, potions_dict):
 
 async def buy_potions(hero_lvl, current_map, GRAPH):
 
-    nearest_healer = await healer_selector(
-        hero_lvl, current_map, healers_list, GRAPH
-    )
+    nearest_healer = await healer_selector(hero_lvl, current_map, healers_list, GRAPH)
     if not nearest_healer:
         return
 
