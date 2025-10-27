@@ -8,6 +8,7 @@ async def bot_interface():
     await driver.evaluate("() => window.selectedExp = null;")
     await driver.evaluate("() => window.selectedE2 = null;")
     await driver.evaluate("() => window.selectedHeroes = null;")
+    await driver.evaluate("() => window.questEnabled = false;")
     script = f"""
         var botIcon = document.createElement('div');
         botIcon.id = 'botIcon';
@@ -20,8 +21,8 @@ async def bot_interface():
             background: linear-gradient(145deg, #1a1a1a, #000000);
             color: #00ff88;
             border-radius: 50%;
-            bottom: 90%;
-            left: 5%;
+            bottom: 94.5vh;
+            left: 16vw;
             display: flex;
             cursor: pointer;
             z-index: 999;
@@ -40,10 +41,10 @@ async def bot_interface():
 
         mainBox.style = `
             position: fixed;
-            bottom: 540px;
-            left: 20px;
+            bottom: 50vh;
+            left: 2vw;
             width: 250px;
-            height: 300px;
+            height: 375px;
             background: #001a00;
             border: 2px solid #00ff88;
             overflow: hidden;
@@ -51,6 +52,7 @@ async def bot_interface():
             display: none;
             flex-direction: column;
             gap: 5px;
+            padding: 10px;
             align-items: center;
             justify-content: center;
             border-radius: 20px;
@@ -285,6 +287,78 @@ async def bot_interface():
         }};
         customWindow.appendChild(selectButton3);
 
+        var header4 = document.createElement('h1');
+        header4.innerText = 'Questy';
+        header4.style = `
+            color: #00ff88;
+            margin: 0;
+            font-size: 1.2em;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+        `;
+        customWindow.appendChild(header4);
+
+        var questToggleContainer = document.createElement('div');
+        questToggleContainer.style = `
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 2px;
+        `;
+
+        var questToggleLabel = document.createElement('span');
+        questToggleLabel.innerText = 'Włączone:';
+        questToggleLabel.style = `
+            color: #00ff88;
+            font-weight: bold;
+        `;
+
+        var questToggle = document.createElement('input');
+        questToggle.type = 'checkbox';
+        questToggle.id = 'questToggle';
+        questToggle.style = `
+            width: 40px;
+            height: 20px;
+            accent-color: #00ff88;
+            cursor: pointer;
+        `;
+        questToggle.onchange = function() {{
+            window.questEnabled = questToggle.checked;
+        }};
+
+        questToggleContainer.appendChild(questToggleLabel);
+        questToggleContainer.appendChild(questToggle);
+        customWindow.appendChild(questToggleContainer);
+        
+
+
+        // --- Drag & Drop ---
+        let dragTarget = mainBox;
+        let offsetX = 0, offsetY = 0;
+        let isDragging = false;
+
+        dragTarget.addEventListener('mousedown', (e) => {{
+            if (e.button !== 0) return;
+            const interactiveTags = ['SELECT', 'OPTION', 'BUTTON', 'INPUT', 'LABEL'];
+            if (interactiveTags.includes(e.target.tagName)) return;
+
+            isDragging = true;
+            offsetX = e.clientX - dragTarget.getBoundingClientRect().left;
+            offsetY = e.clientY - dragTarget.getBoundingClientRect().top;
+            dragTarget.style.transition = 'none';
+        }});
+
+        document.addEventListener('mousemove', (e) => {{
+            if (!isDragging) return;
+            dragTarget.style.left = `${{e.clientX - offsetX}}px`;
+            dragTarget.style.top = `${{e.clientY - offsetY}}px`;
+        }});
+
+        document.addEventListener('mouseup', () => {{
+            if (!isDragging) return;
+            isDragging = false;
+            dragTarget.style.transition = 'all 0.3s ease';
+        }});
         """
     await driver.evaluate(script)
 
@@ -321,6 +395,11 @@ async def get_selected_elita2():
 async def get_selected_heroes():
     driver = await MyDriver().get_driver()
     return await driver.evaluate("() => window.selectedHeroes")
+
+
+async def get_quest_enabled():
+    driver = await MyDriver().get_driver()
+    return await driver.evaluate("() => window.questEnabled")
 
 
 async def set_selected_exp_to_default():

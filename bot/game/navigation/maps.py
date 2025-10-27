@@ -1,3 +1,4 @@
+import asyncio
 import time
 import random
 from bot.core.driver import MyDriver
@@ -27,12 +28,12 @@ async def follow_path(path, currentMap):
         await driver.evaluate(script, isolated_context=False)
 
     while True:
-        time.sleep(random.uniform(0.54, 0.89))
+        await asyncio.sleep(random.uniform(0.54, 0.89))
         new_map = await get_current_map()
         if new_map != currentMap:
             print("Map has changed.")
             break
-    time.sleep(random.uniform(0.47, 0.62))
+    await asyncio.sleep(random.uniform(0.47, 0.62))
 
 
 async def current_location_map():
@@ -91,7 +92,7 @@ async def navigate_tree(selected_exp, current_map, gateway, map_2d, start):
                     goal = (gateway_pos[0], gateway_pos[1])
                     result = a_star(map_2d, start, goal)
                     path = result
-                    time.sleep(random.uniform(0.71, 0.9))
+                    await asyncio.sleep(random.uniform(0.71, 0.9))
                     globals.direction[0] = "bottom"
 
                     for i in path:
@@ -105,12 +106,12 @@ async def navigate_tree(selected_exp, current_map, gateway, map_2d, start):
                         await driver.evaluate(script, isolated_context=False)
 
                     while True:
-                        time.sleep(random.uniform(0.44, 0.49))
+                        await asyncio.sleep(random.uniform(0.44, 0.49))
                         new_map = await get_current_map()
                         if new_map != current_map:
                             print("Map has changed.")
                             break
-                    time.sleep(random.uniform(0.47, 0.62))
+                    await asyncio.sleep(random.uniform(0.47, 0.62))
 
         if (
             globals.direction[0] == "top"
@@ -127,7 +128,7 @@ async def navigate_tree(selected_exp, current_map, gateway, map_2d, start):
                 goal = (gateway_pos[0], gateway_pos[1])
                 result = a_star(map_2d, start, goal)
                 path = result
-                time.sleep(random.uniform(0.65, 0.87))
+                await asyncio.sleep(random.uniform(0.65, 0.86))
                 globals.direction[0] = "top"
 
                 for i in path:
@@ -141,12 +142,12 @@ async def navigate_tree(selected_exp, current_map, gateway, map_2d, start):
                     await driver.evaluate(script, isolated_context=False)
 
                 while True:
-                    time.sleep(random.uniform(0.44, 0.49))
+                    await asyncio.sleep(random.uniform(0.43, 0.49))
                     new_map = await get_current_map()
                     if new_map != current_map:
                         print("Map has changed.")
                         break
-                time.sleep(random.uniform(0.47, 0.62))
+                await asyncio.sleep(random.uniform(0.46, 0.62))
 
 
 async def change_exp_map(

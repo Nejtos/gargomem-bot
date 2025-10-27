@@ -76,4 +76,4 @@ async def buy_potions(hero_lvl, current_map, GRAPH):
 
     if potion_id:
         amount_needed = 30
-        await buy_item([potion_id] * amount_needed, amount_needed)
+        await buy_item([potion_id], amount_needed)

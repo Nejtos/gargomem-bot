@@ -1,4 +1,5 @@
-import time, random
+import asyncio
+import random
 from bot.core.driver import MyDriver
 
 
@@ -29,17 +30,13 @@ async def select_dialogue_line(options):
         key = options[i]
         script = f"""() => window.Engine.dialogue.hotKeyLine('{key}')"""
         await driver.evaluate(script, isolated_context=False)
-        time.sleep(random.uniform(0.23, 0.31))
+        await asyncio.sleep(random.uniform(0.24, 0.32))
 
 
-async def talk_with_npc(mobId, options):
+async def talk_with_npc(mob_id, _options=None):
     driver = await MyDriver().get_driver()
-    script = f"""() => _g("talk&id={mobId}")"""
+    script = f"""(() => _g("talk&id={mob_id}"))()"""
     await driver.evaluate(script, isolated_context=False)
-    time.sleep(random.uniform(0.41, 0.64))
+    await asyncio.sleep(random.uniform(0.1, 0.2))
     while await is_dialogue_open():
-        if len(options) == 0:
-            await select_first_dialogue_line()
-        else:
-            await select_dialogue_line(options)
-        time.sleep(random.uniform(0.47, 0.65))
+        await asyncio.sleep(random.uniform(0.15, 0.25))

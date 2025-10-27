@@ -1,6 +1,6 @@
 import asyncio
 import math
-import time, random
+import random
 from bot.core.driver import MyDriver
 from bot.game.moving.pathfiding import a_star
 from bot.utils.helpers import (
@@ -9,43 +9,46 @@ from bot.utils.helpers import (
 )
 
 
-async def equip_item(item_arr, amount_items):
+async def equip_item(item_arr):
     driver = await MyDriver().get_driver()
-    for i in range(amount_items):
-        item_id = item_arr[i]
+    if not item_arr:
+        return
+    for item_id in item_arr:
         script = f"""() => _g("moveitem&st=1&id={item_id}")"""
         await driver.evaluate(script, isolated_context=False)
-        time.sleep(random.uniform(0.64, 0.91))
+        await asyncio.sleep(random.uniform(0.64, 0.91))
 
 
 async def buy_item(item_arr, amount_items):
     driver = await MyDriver().get_driver()
-    
+
     unique_items = list(set(item_arr))
     multiple_items = len(unique_items) > 1
 
-    for i in range(amount_items):
-        item_id = item_arr[i]
-        script = f"""
-            (() => {{
-                let item = Object.values(window.Engine.shop.items).find(i => i.id == '{item_id}');
-                if(item) {{ window.Engine.shop.basket.buyItem(item); }}
-            }})()
-        """
-        await driver.evaluate(script, isolated_context=False)
-        time.sleep(random.uniform(0.54, 0.76))
-
-        if multiple_items and i > 0 and i % 4 == 0 and i != (amount_items - 1):
-            script = "() => window.Engine.shop.basket.finalize()"
+    for i, item_id in enumerate(unique_items):
+        for _ in range(amount_items):
+            script = f"""
+                (() => {{
+                    let item = Object.values(window.Engine.shop.items).find(i => i.id == '{item_id}');
+                    if(item) {{
+                        window.Engine.shop.basket.buyItem(item);
+                    }}
+                }})()
+            """
             await driver.evaluate(script, isolated_context=False)
-            time.sleep(random.uniform(0.71, 0.93))
+            await asyncio.sleep(random.uniform(0.54, 0.76))
 
-    script = "() => window.Engine.shop.basket.finalize()"
-    await driver.evaluate(script, isolated_context=False)
-    time.sleep(random.uniform(0.61, 0.88))
+        if multiple_items and i > 0 and i % 4 == 0 and i != (len(unique_items) - 1):
+            await driver.evaluate(
+                "window.Engine.shop.basket.finalize()", isolated_context=False
+            )
+            await asyncio.sleep(random.uniform(0.71, 0.93))
 
-    script = "() => window.Engine.shop.close()"
-    await driver.evaluate(script, isolated_context=False)
+    await driver.evaluate(
+        "window.Engine.shop.basket.finalize()", isolated_context=False
+    )
+    await asyncio.sleep(random.uniform(0.61, 0.88))
+    await driver.evaluate("window.Engine.shop.close()", isolated_context=False)
 
 
 async def get_items_amount():
@@ -103,7 +106,7 @@ async def quick_sell_items():
                 () => window.Engine.shop.basket.finalize()
             """
             await driver.evaluate(script, isolated_context=False)
-            time.sleep(random.uniform(0.61, 0.88))
+            await asyncio.sleep(random.uniform(0.61, 0.85))
     script = f"""
         () => window.Engine.shop.close()
     """
@@ -156,18 +159,18 @@ async def sell_item():
             () => window.Engine.shop.basket.sellItem({item})
         """
         await driver.evaluate(script, isolated_context=False)
-        time.sleep(random.uniform(0.54, 0.76))
+        await asyncio.sleep(random.uniform(0.54, 0.76))
         if i > 0 and i % 19 == 0 and i != (amountItems - 1):
             script = f"""
                 () => window.Engine.shop.basket.finalize()
             """
             await driver.evaluate(script, isolated_context=False)
-            time.sleep(random.uniform(0.71, 0.93))
+            await asyncio.sleep(random.uniform(0.71, 0.93))
     script = f"""
         () => window.Engine.shop.basket.finalize()
     """
     await driver.evaluate(script, isolated_context=False)
-    time.sleep(random.uniform(0.61, 0.88))
+    await asyncio.sleep(random.uniform(0.61, 0.88))
     script = f"""
         () => window.Engine.shop.close()
     """
@@ -194,7 +197,7 @@ async def collect_item(goal):
     while checker != path[-1]:
         start_position = await current_position()
         checker = (start_position[0], start_position[1])
-        time.sleep(random.uniform(0.12, 0.25))
+        await asyncio.sleep(random.uniform(0.12, 0.25))
     script = """
         (function() {
             const {x: t, y: e} = Engine.hero.d, i = Engine.map.groundItems.getGroundItemOnPosition(t, e);
@@ -204,64 +207,123 @@ async def collect_item(goal):
         })();
     """
     await driver.evaluate(script, isolated_context=False)
-    time.sleep(random.uniform(0.47, 0.64))
+    await asyncio.sleep(random.uniform(0.47, 0.64))
 
 
-async def open_and_create_recipe(recipe_id):
+async def open_and_create_recipe():
     driver = await MyDriver().get_driver()
     script = f"""
         () => window.Engine.crafting.triggerOpen()
     """
     await driver.evaluate(script, isolated_context=False)
-    time.sleep(random.uniform(1.21, 1.43))
+    await asyncio.sleep(random.uniform(1.21, 1.42))
+
+    recipe = await driver.evaluate(
+        """
+        (() => {
+            const recipes = window.Engine.crafting.recipes.recipes;
+            if (!recipes) return null;
+            const active = Object.entries(recipes)
+                .find(([id, data]) => data.enabled === 1);
+            if (!active) return null;
+            const [id, data] = active;
+            return { id: parseInt(id), name: data.name };
+        })();
+        """,
+        isolated_context=False,
+    )
+
+    if not recipe:
+        return
+
+    recipe_id = recipe["id"]
+
+    await driver.evaluate(
+        f"() => window.Engine.crafting.recipes.showRecipe({recipe_id})",
+        isolated_context=False,
+    )
+    await asyncio.sleep(random.uniform(0.61, 0.88))
 
     script = f"""
         () => window.Engine.crafting.recipes.showRecipe({recipe_id})
     """
     await driver.evaluate(script, isolated_context=False)
-    time.sleep(random.uniform(0.61, 0.88))
+    await asyncio.sleep(random.uniform(0.61, 0.86))
 
     script = f"""
         () => window.Engine.crafting.recipes.confirmUseRecipe({recipe_id})
     """
     await driver.evaluate(script, isolated_context=False)
-    time.sleep(random.uniform(0.56, 0.65))
+    await asyncio.sleep(random.uniform(0.56, 0.65))
 
     script = f"""
         () => window.Engine.hotKeys.checkCanAcceptAlert()
     """
     await driver.evaluate(script, isolated_context=False)
-    time.sleep(random.uniform(0.52, 0.63))
+    await asyncio.sleep(random.uniform(0.52, 0.63))
 
     script = f"""
-        () => window.Engine.crafting.close()
+        () => window.Engine.crafting.triggerClose()
     """
     await driver.evaluate(script, isolated_context=False)
-    time.sleep(random.uniform(0.5, 0.66))
+    await asyncio.sleep(random.uniform(0.5, 0.66))
 
 
-async def create_item(offer_id, item_id):
+async def create_item():
     driver = await MyDriver().get_driver()
+
+    barter_data = await driver.evaluate(
+        """
+        (() => {
+            const categories = window.Engine?.barter?.allCategories;
+            if (!categories) return null;
+            for (const catKey in categories) {
+                const catItems = categories[catKey];
+                if (!Array.isArray(catItems)) continue;
+                for (const item of catItems) {
+                    if (item.maxAmount === 1) {
+                        return {
+                            offerId: item.affectedId,
+                            itemId: item.id,
+                            category: item.category
+                        };
+                    }
+                }
+            }
+            return null;
+        })();
+        """,
+        isolated_context=False,
+    )
+
+    if not barter_data:
+        return
+
+    offer_id = barter_data["offerId"]
+    item_id = barter_data["itemId"]
+    category = barter_data["category"]
+    print(
+        f"⚙️ Creating item: offer_id={offer_id}, item_id={item_id}, category={category}"
+    )
+
     find_offer = f"""
         () => {{
-            let x = window.Engine.barter.createOneOfferOnList(window.Engine.barter.allParseOffers[{offer_id}])
-            window.Engine.barter.recipeClick(x[0], x[0])
+            const offerList = window.Engine.barter.createOneOfferOnList(window.Engine.barter.allParseOffers[{offer_id}]);
+            if (offerList && offerList[0]) {{
+                window.Engine.barter.recipeClick(offerList[0], offerList[0]);
+            }}
         }}
     """
-    await driver.evaluate(find_offer)
-    time.sleep(random.uniform(0.71, 0.98))
+    await driver.evaluate(find_offer, isolated_context=False)
+    await asyncio.sleep(random.uniform(0.71, 0.98))
 
-    craft_item = f"""
-        () => window.Engine.barter.doBarter({item_id})
-    """
-    await driver.evaluate(craft_item)
-    time.sleep(random.uniform(0.76, 0.96))
+    craft_item = f"() => window.Engine.barter.doBarter({item_id})"
+    await driver.evaluate(craft_item, isolated_context=False)
+    await asyncio.sleep(random.uniform(0.76, 0.96))
 
-    close_barter = f"""
-        () => window.Engine.barter.close()
-    """
-    await driver.evaluate(close_barter)
-    time.sleep(random.uniform(0.61, 0.88))
+    close_barter = "() => window.Engine.barter.close()"
+    await driver.evaluate(close_barter, isolated_context=False)
+    await asyncio.sleep(random.uniform(0.61, 0.88))
 
 
 async def get_item_id_by_name(item_name):
