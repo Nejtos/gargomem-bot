@@ -42,6 +42,29 @@ async def get_npc_id(arr):
     return mob_id, mob_type
 
 
+async def is_npc_walkover(goal):
+    resultX, resultY = goal
+
+    page = await MyDriver().get_driver()
+
+    walk_over = await page.evaluate(
+        f"""
+        (() => {{
+            const npcs = window.Engine.npcs.check();
+            for (const npc of Object.values(npcs)) {{
+                if (npc.d.x === {resultX} && npc.d.y === {resultY}) {{
+                    return !!npc.walkOver;
+                }}
+            }}
+            return false;
+        }})()
+        """,
+        isolated_context=False
+    )
+
+    return bool(walk_over)
+
+
 async def find_nearest_mob(map, start, arr):
     distance = None
     nearest_mob = [(1, 1)]

@@ -14,7 +14,7 @@ async def go_to_target(path, mobId=None, mobType=None):
 
     driver = await MyDriver().get_driver()
 
-    if mobType == "heroes":
+    if mobType == "heroes" or mobType == "gateway":
         target_x, target_y = path[-1]
     else:
         target_x, target_y = path[-2]
@@ -23,7 +23,7 @@ async def go_to_target(path, mobId=None, mobType=None):
     await driver.evaluate(script, isolated_context=False)
 
     if (len(path) <= 6 and mobId is not None) or (
-        mobType == "e2" or mobType == "heroes" or mobType == "healer" or mobType == "merchant"
+        mobType == "e2" or mobType == "heroes" or mobType == "healer" or mobType == "merchant" or mobType == "quest"
     ):
         mob_alive_script = f"""
             () => {{
@@ -39,7 +39,7 @@ async def go_to_target(path, mobId=None, mobType=None):
 
             if (
                 await driver.evaluate(mob_alive_script, isolated_context=False) == 0
-                and mobType != "heroes"
+                and mobType != "heroes" and mobType != "quest"
             ):
                 return False
 
