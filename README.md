@@ -11,7 +11,7 @@ Gargomem-bot is a sophisticated, asynchronous automation tool designed for a 2D 
 *   **Advanced Navigation and Pathfinding**:
     *   Utilizes A* for efficient pathfinding on individual maps.
     *   Navigates between maps using a world graph and Breadth-First Search (BFS).
-    *   The heroes hunting module employs route optimization (approximating the Traveling Salesperson Problem with Held-Karp) to plan the most efficient scanning paths.
+    *   The heroes hunting module employs route optimization (approximating the Traveling Salesman Problem with Held-Karp) to plan the most efficient scanning paths.
 *   **Discord Integration**:
     *   Sends real-time notifications about valuable loot to a specified Discord webhook.
     *   When a heroes is found, it uses a Discord bot to request user input (Attack, Wait, or Logout) via reactions, enabling remote control over critical decisions.
