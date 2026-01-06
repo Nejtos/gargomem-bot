@@ -1,7 +1,7 @@
 import asyncio
 import random
 from bot.core.driver import MyDriver
-from bot.utils.helpers import current_position
+from bot.utils.helpers import current_position, retry
 
 
 async def check_collision(driver, x, y):
@@ -15,7 +15,7 @@ async def check_collision(driver, x, y):
     return result in (0, "0")
 
 
-def generate_possible_moves(x, y):
+async def generate_possible_moves(x, y):
     return [
         (x + dx, y + dy)
         for dx in (-1, 0, 1)
@@ -23,7 +23,7 @@ def generate_possible_moves(x, y):
         if not (dx == 0 and dy == 0)
     ]
 
-
+@retry(max_attempts=5, delay=3)
 async def is_move_blocked(captcha_event=None):
     driver = await MyDriver().get_driver()
 
@@ -44,7 +44,7 @@ async def is_move_blocked(captcha_event=None):
     if overlay_visible or is_blocked:
         await asyncio.sleep(random.uniform(1, 4))
         start_x, start_y = await current_position()
-        possible_moves = generate_possible_moves(start_x, start_y)
+        possible_moves = await generate_possible_moves(start_x, start_y)
         random.shuffle(possible_moves)
 
         for move_x, move_y in possible_moves:
