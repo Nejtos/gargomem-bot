@@ -64,6 +64,6 @@ async def sell_items(hero_lvl, current_map, GRAPH):
     path = a_star(map_2d, start, goal)
     await go_to_target(path, mobId=nearest_merchant["npc_id"], mobType="merchant")
 
-    await talk_with_npc(nearest_merchant["npc_id"], options=[1])
+    await talk_with_npc(nearest_merchant["npc_id"], _options=[1])
 
     await quick_sell_items()

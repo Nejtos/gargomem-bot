@@ -70,7 +70,7 @@ async def buy_potions(hero_lvl, current_map, GRAPH):
     path = a_star(map_2d, start, goal)
     await go_to_target(path, mobId=nearest_healer["npc_id"], mobType="healer")
 
-    await talk_with_npc(nearest_healer["npc_id"], options=[2])
+    await talk_with_npc(nearest_healer["npc_id"], _options=[2])
 
     potion_id = select_potion(hero_lvl, potions_dict)
 
