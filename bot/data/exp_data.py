@@ -79,20 +79,9 @@ exp_dict = {
             "Niegodziwy drań",
         ],
     },
-    "Orki": {
-        "target_map": "116",
-        "max_lvl": 50,
-        "mobs": [
-            "Ork bashwooz",
-            "Ork zhaghokk",
-            "Ork kuurgh",
-            "Ork trarroll",
-            "Ork wuakl",
-        ],
-    },
     "Koboldy": {
         "target_map": "814",
-        "max_lvl": 55,
+        "max_lvl": 52,
         "mobs": [
             "Kobold",
             "Kobold łucznik",
@@ -107,6 +96,7 @@ exp_dict = {
             "Żądłak",
             "Wściekłówka",
             "Nieżłopka wątpia",
+            "Podżerka krwawa",
         ],
     },
 }
