@@ -1,116 +1,100 @@
 import asyncio
 import random
 import sys
+import traceback
+
 import keyboard
+
 from bot.core.driver import MyDriver
 from bot.core.movement_guard import is_move_blocked
-from bot.game.services.quest_service import disable_quest_hooks, run_quest_service
-from bot.game.tutorials.intro import (
-    tutorial_part1,
-    tutorial_part2,
-    tutorial_part3,
-    tutorial_part4,
-)
 from bot.core.captcha import is_captcha_active
-from bot.ui.botUI import (
-    get_quest_enabled,
-    get_selected_exp,
-    get_selected_elita2,
-    get_selected_heroes,
-)
-from bot.game.services.e2_service import e2_service
-from bot.game.services.exp_service import exp_service
+from bot.game.entities.player import Player
+from bot.game.services.helpers import get_respawn_time, retry
+from bot.game.workflows.exp_workflow import run_exp_workflow
 from bot.game.services.heroes.heroes_service import heroes_service
+from bot.game.services.quest_service import disable_quest_hooks
+from bot.game.workflows.quest_workflow import run_quest_workflow
+from bot.game.workflows.e2_workflow import run_e2_workflow
+from bot.ui.botUI import BotUI, BotUISelections
 import bot.globals as globals
-from bot.utils.helpers import get_respawn_time, is_hero_dead
 
 
-async def bot(heal_event, captcha_event):
-    driver_instance = MyDriver()
-    prof_index = await driver_instance.get_profNum()
-    print(f"Bot is running - profile {prof_index}")
-    globals.is_game_loading[0] = True
+class GameBot:
+    def __init__(self, heal_event: asyncio.Event, captcha_event: asyncio.Event) -> None:
+        self._heal_event = heal_event
+        self._captcha_event = captcha_event
+        self._driver = MyDriver()
+        self._ui = BotUI()
+        self._quests_enabled = False
 
-    try:
-        while True:
-            if keyboard.is_pressed("|"):
-                print("🛑 Stop key detected — shutting down...")
-                break
-            await handle_game_flow(heal_event, captcha_event)
-            await asyncio.sleep(0.1)
-    except Exception as e:
-        import traceback
+    async def run(self) -> None:
+        prof_index = await self._driver.get_profNum()
+        print(f"Bot is running - profile {prof_index}")
+        globals.is_game_loading[0] = True
 
-        print("⚠️ BOT CRASH DETECTED ⚠️")
-        traceback.print_exc()
-        print(f"❌ Error message: {e}")
-        await asyncio.sleep(3)
-    finally:
-        print("🛑 Bot has stopped — closing browser...")
         try:
-            await driver_instance.close_driver()
+            while True:
+                if keyboard.is_pressed("|"):
+                    print("🛑 Stop key detected — shutting down...")
+                    break
+                await self._handle_game_flow()
+                await asyncio.sleep(0.1)
+        except Exception as e:
+            print("⚠️ BOT CRASH DETECTED ⚠️")
+            traceback.print_exc()
+            print(f"❌ Error message: {e}")
+            await asyncio.sleep(3)
         finally:
-            sys.exit(0)
+            print("🛑 Bot has stopped — closing browser...")
+            try:
+                await self._driver.close_driver()
+            finally:
+                sys.exit(0)
 
+    @retry(max_attempts=10, delay=5, refresh=True)
+    async def _handle_game_flow(self) -> None:
+        player = Player()
+        captcha_active = await self._check_captcha_and_loading()
 
-async def handle_game_flow(heal_event, captcha_event):
-    captcha_active = await check_captcha_and_loading(captcha_event)
+        if await player.is_dead():
+            respawn_time = await get_respawn_time()
+            print(f"💀 Character is unconscious — waiting {respawn_time} seconds to respawn...")
+            await asyncio.sleep(respawn_time + 2)
+            self._heal_event.set()
 
-    death_checker = await is_hero_dead()
-    if death_checker:
-        respawn_time = await get_respawn_time()
-        print(f"💀 Character is unconscious — waiting {respawn_time} seconds to respawn...")
-        await asyncio.sleep(respawn_time + 2)
-        heal_event.set()
+        selections: BotUISelections = await self._ui.get_selections()
+        await self._sync_quest_state(selections.quest_enabled)
 
-    selected_exp = await get_selected_exp()
-    selected_e2 = await get_selected_elita2()
-    selected_heroes = await get_selected_heroes()
-    quests_enable = await get_quest_enabled()
+        if selections.selected_exp and selections.selected_exp != "Wybierz":
+            await self._handle_exp_selection(selections.selected_exp, selections.selected_e2)
+        elif selections.selected_e2 and selections.selected_e2 != "Wybierz" and not captcha_active:
+            await run_e2_workflow(self._heal_event, None, selections.selected_e2)
+        elif selections.selected_heroes and selections.selected_heroes != "Wybierz":
+            await heroes_service(selections.selected_heroes, self._heal_event)
 
-    if selected_exp and selected_exp != "Wybierz":
-        await handle_exp_selection(heal_event, selected_exp, selected_e2)
-    elif selected_e2 and selected_e2 != "Wybierz" and captcha_active is False:
-        await e2_service(heal_event, None, selected_e2)
-    elif selected_heroes and selected_heroes != "Wybierz":
-        await heroes_service(selected_heroes, heal_event)
-    
-    if quests_enable and not globals.previous_quests_enabled[0]:
-        await run_quest_service()
-        globals.previous_quests_enabled[0] = True
-    elif not quests_enable and globals.previous_quests_enabled[0]:
-        await disable_quest_hooks()
-        globals.previous_quests_enabled[0] = False
+    async def _sync_quest_state(self, quests_enabled: bool) -> None:
+        if quests_enabled and not self._quests_enabled:
+            await run_quest_workflow()
+            await self._quest_service.run()
+            self._quests_enabled = True
+        elif not quests_enabled and self._quests_enabled:
+            await disable_quest_hooks()
+            self._quests_enabled = False
 
+    async def _check_captcha_and_loading(self) -> bool:
+        captcha_active = await is_captcha_active()
 
+        if globals.is_game_loading[0] and captcha_active:
+            self._captcha_event.set()
+            await self._captcha_event.wait()
+            await asyncio.sleep(random.uniform(2.0, 4.0))
+        else:
+            globals.is_game_loading[0] = False
+            await is_move_blocked(self._captcha_event)
 
-async def check_captcha_and_loading(captcha_event):
-    captcha_active = await is_captcha_active()
+        return captcha_active
 
-    if globals.is_game_loading[0] and captcha_active:
-        captcha_event.set()
-        await captcha_event.wait()
-        await asyncio.sleep(random.uniform(2.0, 4.0))
-    else:
-        globals.is_game_loading[0] = False
-        await is_move_blocked(captcha_event)
-
-    return captcha_active
-
-
-async def handle_exp_selection(heal_event, selected_exp, selected_e2):
-    if selected_e2 and selected_e2 != "Wybierz":
-        return
-
-    tutorial_handlers = {
-        "Intro P1": tutorial_part1,
-        "Intro P2": tutorial_part2,
-        "Intro P3": tutorial_part3,
-        "Intro P4": tutorial_part4,
-    }
-
-    if selected_exp in tutorial_handlers:
-        # await tutorial_handlers[selected_exp]()
-        await run_quest_service()
-    elif selected_exp != "Intro":
-        await exp_service(heal_event, selected_exp)
+    async def _handle_exp_selection(self, selected_exp: str, selected_e2: str | None) -> None:
+        if selected_e2 and selected_e2 != "Wybierz":
+            return
+        await run_exp_workflow(self._heal_event, selected_exp, self._ui)

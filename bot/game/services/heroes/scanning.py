@@ -2,8 +2,9 @@ import asyncio
 from collections import deque
 from typing import Optional
 from bot.core.driver import MyDriver
-from bot.game.interactions.attack import attack_mob
-from bot.game.moving.moving import go_to_target
+# from bot.game.interactions.attack import attack_mob
+# from bot.game.moving.moving import go_to_target
+from bot.game.behaviors.attack import attack_mob
 from bot.game.services.heroes.config import (
     APPROACH_RESP_RADIUS_TILES,
     DECISION_TIMEOUT_SECONDS,
@@ -24,6 +25,7 @@ from bot.game.services.heroes.detection import (
     detect_hero_near_any_respawn_on_map,
     detect_hero_near_coordinate,
     engine_get_npc_by_id,
+    get_npc_id,
 )
 from bot.game.services.heroes.gateways import (
     collect_exit_positions_for_target,
@@ -57,8 +59,8 @@ from bot.game.services.heroes.utils import (
     safe_currentLocationMap,
 )
 from bot.game.services.heroes.world_graph import build_reverse_graph, load_world_graph
+from bot.game.services.move_service import go_to_target
 from bot.integrations.dsc_reaction_control import request_hero_decision_via_webhook
-from bot.utils.helpers import get_npc_id
 from bot.data.heroes_data import heroes_dict
 
 

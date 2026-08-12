@@ -100,27 +100,43 @@ async def captcha(captcha_event):
 async def captcha_resolver():
     driver = await MyDriver().get_driver()
 
-    buttons = await driver.locator(
-        "div.captcha__buttons > div.button.small.green"
-    ).all()
+    # buttons = await driver.locator(
+    #     "div.captcha__buttons > div.button.small.green"
+    # ).all()
 
-    star_buttons = [btn for btn in buttons if "*" in (await btn.inner_text())]
+    # star_buttons = [btn for btn in buttons if "*" in (await btn.inner_text())]
+    buttons_locator = driver.locator("div.captcha__buttons > div.button.small.green")
+    count = await buttons_locator.count()
+
+    star_indices = []
+    for i in range(count):
+        btn = buttons_locator.nth(i)
+        if "*" in await btn.inner_text():
+            star_indices.append(i)
 
     clockwise = random.choice([True, False])
     if not clockwise:
-        star_buttons.reverse()
+        star_indices.reverse()
 
-    for btn in star_buttons:
-        await btn.wait_for(state="visible", timeout=2000)
+    for idx in star_indices:
+        # await btn.wait_for(state="visible", timeout=2000)
+        btn = buttons_locator.nth(idx)
         await btn.click()
-        await asyncio.sleep(random.uniform(0.55, 0.8))
+        await asyncio.sleep(random.uniform(0.45, 0.65))
 
-    confirm = driver.locator(
-        "div.captcha__confirm > div.button.small.green", has_text="Potwierdzam"
-    ).first
-    await confirm.wait_for(state="visible", timeout=2000)
-    await confirm.click()
-    await asyncio.sleep(random.uniform(0.2, 0.4))
+    # confirm = driver.locator(
+    #     "div.captcha__confirm > div.button.small.green", has_text="Potwierdzam"
+    # ).first
+    confirm = driver.locator("div.captcha__confirm > div.button.small.green").filter(has_text="Potwierdzam")
+    # await confirm.wait_for(state="visible", timeout=10000)
+    # await confirm.click()
+    # await asyncio.sleep(random.uniform(0.2, 0.4))
+    try:
+        await confirm.wait_for(state="visible", timeout=10000)
+        await confirm.click()
+        await asyncio.sleep(random.uniform(0.2, 0.4))
+    except Exception as e:
+        print(f"Confirm button not found after clicking stars: {e}")
 
 
 """

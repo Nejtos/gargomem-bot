@@ -1,6 +1,7 @@
 import json
 from typing import Optional, Tuple
 from bot.core.driver import MyDriver
+from bot.game.entities.mob import Mob
 from bot.game.services.heroes.config import (
     HERO_DISPLAY_NAME,
     HERO_FIXED_ID,
@@ -8,9 +9,23 @@ from bot.game.services.heroes.config import (
 )
 from bot.game.services.heroes.grid_utils import manhattan
 from bot.game.services.heroes.utils import safe_currentLocationMap
-from bot.utils.helpers import get_npc_id
 from bot.data.heroes_data import heroes_dict
 
+
+async def get_npc_id(arr):
+    mob = Mob()
+    # all_npcs = await get_npcs_from_NI()
+    all_npcs = await mob.get_all_npcs()
+    coordinates = arr[0]
+    resultX, resultY = coordinates
+    mob_id = ""
+    mob_type = -1
+    for npc_id, npc_data in all_npcs.items():
+        if npc_data["x"] == resultX and npc_data["y"] == resultY:
+            mob_id = npc_data["id"]
+            mob_type = npc_data["type"]
+            break
+    return mob_id, mob_type
 
 async def engine_get_npc_by_id(npc_id: int | str):
     page = await MyDriver().get_driver()

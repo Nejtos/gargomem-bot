@@ -1,13 +1,13 @@
 import random
 import sys
 import asyncio
-from bot.utils.credentials import read_credentials
-from bot.utils.threads import captcha_thread_func, heal_hero_thread_func
+from bot.core.threads import captcha_thread_func, heal_hero_thread_func
+from bot.game.auth.credentials import read_credentials
 from bot.core.driver import MyDriver
 from bot.game.auth.register import register
 from bot.game.auth.login import login
-from bot.ui.botUI import bot_interface
-from bot.game.bot import bot
+from bot.ui.botUI import BotUI
+from bot.game.bot import GameBot
 from bot.integrations.dsc_reaction_control import start_discord_bot
 from dotenv import load_dotenv
 
@@ -36,8 +36,14 @@ async def main():
     else:
         await register(prof_num)
     await asyncio.sleep(random.uniform(2.5, 5.5))
-    await bot_interface()
-    await bot(heal_event, captcha_event)
+
+    # await bot_interface()
+    # await bot(heal_event, captcha_event)
+    ui = BotUI()
+    await ui.renderUI()
+
+    game_bot = GameBot(heal_event, captcha_event)
+    await game_bot.run()
 
 
 if __name__ == "__main__":

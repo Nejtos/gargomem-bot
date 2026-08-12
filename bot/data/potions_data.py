@@ -5,6 +5,6 @@ potions_dict = [
     },
     {
         "potion_id": "41879",
-        "max_lvl": 60,
+        "max_lvl": 70,
     },
 ]

@@ -1,7 +1,7 @@
 import asyncio
 from typing import Optional
 from datetime import datetime, timedelta
-from bot.game.navigation.helpers import get_current_map
+from bot.game.entities.map import Map
 from bot.game.services.heroes.config import RESTART_CYCLE_SIGNAL, WORLD_JSON_PATH
 from bot.game.services.heroes.interface import heroes_reload_game_and_prepare
 from bot.game.services.heroes.region_helpers import (
@@ -30,6 +30,7 @@ from bot.data.heroes_data import heroes_dict
 
 
 async def heroes_service(selected_heroes: str, heal_event):
+    map = Map()
     hero = selected_heroes
     graph = load_world_graph(WORLD_JSON_PATH, directed=True)
     rev_graph = build_reverse_graph(graph)
@@ -57,8 +58,8 @@ async def heroes_service(selected_heroes: str, heal_event):
                 remaining.difference_update(scanned_maps)
             if not remaining:
                 break
-
-            cur = str(await get_current_map())
+            cur = str(await map.get_current_map_id())
+            # cur = str(await get_current_map())
 
             attachments_by_parent = await compute_attached_children(
                 hero, remaining, graph, rev_graph
@@ -120,7 +121,8 @@ async def heroes_service(selected_heroes: str, heal_event):
                     continue
 
                 while True:
-                    cur_now = str(await get_current_map())
+                    cur_now = str(await map.get_current_map_id())
+                    # cur_now = str(await get_current_map())
 
                     if cur_now in remaining and cur_now not in scanned_maps:
                         avoid = set(scanned_maps)

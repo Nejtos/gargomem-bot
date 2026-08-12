@@ -2,7 +2,8 @@ import asyncio
 import json
 import random
 
-from bot.game.navigation.helpers import get_current_map, get_gateway_pos, get_gateways
+# from bot.game.navigation.helpers import get_current_map, get_gateway_pos, get_gateways
+from bot.game.entities.map import Map
 from bot.game.services.heroes.cache import _exit_cache_get, _exit_cache_put
 
 
@@ -44,10 +45,12 @@ def _filter_gateways_for_target(gateways, target_id_str: str):
 async def wait_for_map_switch(
     prev_map: str, target_map: str, timeout: float = 60.0
 ) -> bool:
+    map = Map()
     target = str(target_map)
     start_t = asyncio.get_event_loop().time()
     while True:
-        cur = str(await get_current_map())
+        cur = str(await map.get_current_map_id())
+        # cur = str(await get_current_map())
         if cur == target:
             await asyncio.sleep(random.uniform(0.25, 0.45))
             return True
@@ -62,17 +65,20 @@ async def wait_for_gateways_ready(
     timeout: float = 15.0,
     poll: float = 0.3,
 ) -> bool:
+    map = Map()
     target = str(target_map_id)
     want_next = str(expect_next) if expect_next is not None else None
     start_t = asyncio.get_event_loop().time()
     while True:
-        cur = str(await get_current_map())
+        cur = str(await map.get_current_map_id())
+        # cur = str(await get_current_map())
         if cur != target:
             if asyncio.get_event_loop().time() - start_t > timeout:
                 return False
             await asyncio.sleep(poll)
             continue
-        gateways = await get_gateways()
+        gateways = await map.get_current_map_gateways()
+        # gateways = await get_gateways()
         if isinstance(gateways, list) and len(gateways) > 0:
             if want_next is None:
                 return True
@@ -84,11 +90,13 @@ async def wait_for_gateways_ready(
                 except Exception:
                     want_next_int = None
                 if want_next_int is not None:
-                    pos = await get_gateway_pos(gateways_js, want_next_int)
+                    pos = await map.get_current_map_gateway_pos(gateways_js, want_next_int)
+                    # pos = await get_gateway_pos(gateways_js, want_next_int)
                     if pos and len(pos) >= 2:
                         pos_ok = True
                 if not pos_ok:
-                    pos = await get_gateway_pos(gateways_js, json.dumps(want_next))
+                    pos = await map.get_current_map_gateway_pos(gateways_js, json.dumps(want_next))
+                    # pos = await get_gateway_pos(gateways_js, json.dumps(want_next))
                     if pos and len(pos) >= 2:
                         pos_ok = True
                 if pos_ok:
@@ -123,8 +131,10 @@ def _exit_pairs_from_gateways_list(gateways):
 async def collect_exit_positions_for_target(
     next_map_id, retries: int = 8, delay: float = 0.25
 ):
+    map = Map()
     try:
-        cur_map_id = str(await get_current_map())
+        cur_map_id = str(await map.get_current_map_id())
+        # cur_map_id = str(await get_current_map())
     except Exception:
         cur_map_id = None
 
@@ -142,7 +152,8 @@ async def collect_exit_positions_for_target(
 
     for _ in range(retries):
         try:
-            gateways = await get_gateways()
+            gateways = await map.get_current_map_gateways()
+            # gateways = await get_gateways()
             if not isinstance(gateways, list) or not gateways:
                 await asyncio.sleep(delay)
                 continue
@@ -150,14 +161,16 @@ async def collect_exit_positions_for_target(
 
             if next_as_int is not None:
                 try:
-                    pos = await get_gateway_pos(gateways_js, next_as_int)
+                    pos = await map.get_current_map_gateway_pos(gateways_js, next_as_int)
+                    # pos = await get_gateway_pos(gateways_js, next_as_int)
                     for p in _pairs_from_flat_list(pos):
                         out.add((int(p[0]), int(p[1])))
                 except Exception:
                     pass
 
             try:
-                pos = await get_gateway_pos(gateways_js, json.dumps(str(next_map_id)))
+                pos = await map.get_current_map_gateway_pos(gateways_js, json.dumps(str(next_map_id)))
+                # pos = await get_gateway_pos(gateways_js, json.dumps(str(next_map_id)))
                 for p in _pairs_from_flat_list(pos):
                     out.add((int(p[0]), int(p[1])))
             except Exception:

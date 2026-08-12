@@ -1,23 +1,26 @@
 exp_selectors_dict = {
     "option1": "Wybierz",
-    "option2": "Intro P1",
-    "option3": "Intro P2",
-    "option4": "Intro P3",
-    "option5": "Intro P4",
-    "option6": "Mrówki",
-    "option7": "Niedźwiadki",
-    "option8": "Demony",
-    "option9": "Rozbójnicy",
-    "option10": "Gobliny",
-    "option11": "Dziki",
-    "option12": "Zbiry",
-    "option13": "Orki",
-    "option14": "Pokątniki",
-    "option15": "Koboldy",
+    # 1-100
+    "option2": "Intro",
+    "option3": "Mrówki",
+    "option4": "Niedźwiadki",
+    "option5": "Demony",
+    "option6": "Rozbójnicy",
+    "option7": "Gobliny",
+    "option8": "Dziki",
+    "option9": "Zbiry",
+    "option10": "Koboldy",
+    "option11": "Żądłaki",
+    "option12": "Gnole",
+    "option13": "Mrówki kolonia",
+    # 100-200
+    # 200-300
+    
 }
 
 e2_selectors_dict = {
     "option1": "Wybierz",
+    # 1-100
     "option2": "Mushita",
     "option3": "Kotołak",
     "option4": "Shae",
@@ -28,12 +31,17 @@ e2_selectors_dict = {
     "option9": "Szczęt",
     "option10": "Razio",
     "option11": "Owadzia Matka",
+    # 100-200
+    # 200-300
 }
 
 heroes_selectors_dict = {
     "option1": "Wybierz",
+    # 1-100
     "option2": "Domina",
     "option3": "Patryk",
     "option4": "Karmazyn",
     "option5": "Złodziej",
+    # 100-200
+    # 200-300
 }

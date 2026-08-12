@@ -1,9 +1,10 @@
 from collections import deque
 import heapq
 
-from bot.game.moving.pathfiding import a_star
+# from bot.game.moving.pathfiding import a_star
 from bot.game.services.heroes.cache import _BFS_DIST_CACHE
 from bot.game.services.heroes.config import BFS_DIST_CACHE_MAX, USE_LOCAL_ASTAR
+from bot.game.services.map_services import a_star
 
 
 class Node:

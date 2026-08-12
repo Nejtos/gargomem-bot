@@ -1,9 +1,11 @@
 import asyncio
 import random
 from typing import Optional
+from bot.game.entities.player import Player
 from bot.game.services.heroes.config import HERO_RESPAWN_WINDOWS
 from bot.game.services.heroes.grid_utils import _grid_is_valid
-from bot.utils.helpers import current_location_map, current_position
+from bot.game.services.map_services import current_location_map
+# from bot.utils.helpers import current_location_map, current_position
 
 
 async def safe_currentLocationMap(max_retries: int = 40, delay: float = 0.15):
@@ -24,9 +26,11 @@ async def safe_currentLocationMap(max_retries: int = 40, delay: float = 0.15):
 async def safe_current_position(
     max_retries: int = 40, delay: float = 0.12
 ) -> Optional[tuple[int, int]]:
+    player = Player()
     for _ in range(max_retries):
         try:
-            pos = await current_position()
+            # pos = await current_position()
+            pos = await player.position()
             if not pos or len(pos) < 2:
                 await asyncio.sleep(delay)
                 continue

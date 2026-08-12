@@ -1,7 +1,8 @@
 import asyncio
 import random
 from bot.core.driver import MyDriver
-from bot.utils.helpers import current_position, retry
+from bot.game.entities.player import Player
+from bot.game.services.helpers import retry
 
 
 async def check_collision(driver, x, y):
@@ -23,9 +24,10 @@ async def generate_possible_moves(x, y):
         if not (dx == 0 and dy == 0)
     ]
 
-@retry(max_attempts=5, delay=3)
+@retry(max_attempts=5, delay=3, refresh=False)
 async def is_move_blocked(captcha_event=None):
     driver = await MyDriver().get_driver()
+    player = Player()
 
     overlay_visible = await driver.evaluate(
         """
@@ -43,7 +45,8 @@ async def is_move_blocked(captcha_event=None):
 
     if overlay_visible or is_blocked:
         await asyncio.sleep(random.uniform(1, 4))
-        start_x, start_y = await current_position()
+        # start_x, start_y = await current_position()
+        start_x, start_y = await player.position()
         possible_moves = await generate_possible_moves(start_x, start_y)
         random.shuffle(possible_moves)
 

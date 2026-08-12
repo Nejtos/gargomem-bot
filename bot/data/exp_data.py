@@ -50,7 +50,7 @@ exp_dict = {
     },
     "Gobliny": {
         "target_map": "725",
-        "max_lvl": 36,
+        "max_lvl": 34,
         "mobs": [
             "Goblin traper",
             "Leśny goblin",
@@ -72,7 +72,7 @@ exp_dict = {
     },
     "Zbiry": {
         "target_map": "2308",
-        "max_lvl": 50,
+        "max_lvl": 49,
         "mobs": [
             "Podły szabrownik",
             "Nikczemny łotr",
@@ -90,13 +90,36 @@ exp_dict = {
     },
     "Żądłaki": {
         "target_map": "5394",
-        "max_lvl": 60,
+        "max_lvl": 57,
         "mobs": [
             "Żądłak rogaty",
             "Żądłak",
             "Wściekłówka",
             "Nieżłopka wątpia",
             "Podżerka krwawa",
+        ],
+    },
+    "Gnole": {
+        "target_map": "276",
+        "max_lvl": 63,
+        "mobs": [
+            "Gnoll wojownik",
+            "Gnoll łucznik",
+            "Gnoll mistrz ostrzy",
+            "Gnoll szaman",
+            "Gnoll łowca",
+            "Gnoll strażnik",
+            "Tarrol Agze",
+        ],
+    },
+    "Mrówcza kolonia": {
+        "target_map": "6540",
+        "max_lvl": 70,
+        "mobs": [
+            "Mrówka żołnierz",
+            "Mrówka robotnica",
+            "Mrówka z larwą",
+            "Mrówka Królowa",
         ],
     },
 }

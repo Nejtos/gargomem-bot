@@ -1,8 +1,9 @@
 import asyncio
 import random
 from typing import Optional
-from bot.game.moving.moving import go_to_target
-from bot.game.navigation.helpers import get_current_map
+# from bot.game.moving.moving import go_to_target
+# from bot.game.navigation.helpers import get_current_map
+from bot.game.entities.map import Map
 from bot.game.services.heroes.config import INF_BIG
 from bot.game.services.heroes.gateways import (
     collect_exit_positions_for_target,
@@ -19,15 +20,18 @@ from bot.game.services.heroes.utils import (
     safe_currentLocationMap,
 )
 from bot.game.services.heroes.world_graph import bfs_path, bfs_path_avoid_nodes
+from bot.game.services.move_service import go_to_target
 
 
 async def wait_for_map_render_ready(
     target_map_id: Optional[str] = None, timeout: float = 6.0, poll: float = 0.15
 ) -> bool:
+    map = Map()
     start_t = asyncio.get_event_loop().time()
     while True:
         try:
-            cur = str(await get_current_map())
+            # cur = str(await get_current_map())
+            cur = str(await map.get_current_map_id())
             if target_map_id is None or str(target_map_id) == cur:
                 grid = await safe_currentLocationMap(max_retries=1, delay=poll)
                 if _grid_is_valid(grid):
@@ -64,11 +68,14 @@ async def choose_nearest_by_path(
 
 
 async def travel_one_step(cur_map: str, nxt_map: str) -> bool:
+    map = Map()
     cur_map = str(cur_map)
     nxt_map = str(nxt_map)
-    on_cur = str(await get_current_map()) == cur_map
+    # on_cur = str(await get_current_map()) == cur_map
+    on_cur = str(await map.get_current_map_id()) == cur_map
     if not on_cur:
-        await wait_for_gateways_ready(str(await get_current_map()))
+        # await wait_for_gateways_ready(str(await get_current_map()))
+        await wait_for_gateways_ready(str(await map.get_current_map_id()))
     else:
         await wait_for_gateways_ready(cur_map, expect_next=nxt_map)
 

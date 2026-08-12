@@ -7,6 +7,22 @@
       "npc_location_id": 2,
       "npc_coords": [42, 56],
       "access_min_lvl": 15
+    },
+    {
+      "npc_name": "Mroczny Zgrzyt",
+      "npc_id": 11646,
+      "npc_location": "Eder",
+      "npc_location_id": 33,
+      "npc_coords": [6, 4],
+      "access_min_lvl": 33
+    },
+    {
+      "npc_name": "Sprzedawca Roan",
+      "npc_id": 66,
+      "npc_location": "Ithan",
+      "npc_location_id": 1,
+      "npc_coords": [39, 51],
+      "access_min_lvl": 45
     }
   ],
   "w": [
